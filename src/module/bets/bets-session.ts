@@ -133,7 +133,12 @@ export const placeBet = async (socket: Socket, betData: ReqData[]) => {
         };
 
         await insertBets(dbObj);
-        return socket.emit('result', { winningNumber, totalWinAmount, status: totalWinAmount > 0 ? true : false });
+    
+        socket.emit('result', { 
+            winningNumber, 
+            totalWinAmount, 
+            status: totalWinAmount > 0 
+         });
 
     } catch (err) {
         console.error("Error in placeBet:", err);
