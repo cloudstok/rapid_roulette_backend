@@ -1,6 +1,7 @@
 import amqp, { Channel, Options } from "amqplib";
 import { createLogger } from "../utilities/logger";
-
+import dotenv from 'dotenv';
+dotenv.config();
 const rabbitMQLogger = createLogger("Queue");
 
 let pubChannel: Channel | null = null;
@@ -11,6 +12,7 @@ const AMQP_CONNECTION_STRING = process.env.AMQP_CONNECTION_STRING;
 const AMQP_EXCHANGE_NAME = process.env.AMQP_EXCHANGE_NAME;
 
 if (!AMQP_CONNECTION_STRING || !AMQP_EXCHANGE_NAME) {
+    console.log({ AMQP_CONNECTION_STRING, AMQP_EXCHANGE_NAME}, "okk");
     throw new Error("Environment variables AMQP_CONNECTION_STRING or AMQP_EXCHANGE_NAME are not set.");
 }
 

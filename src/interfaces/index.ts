@@ -1,10 +1,10 @@
 export type BetResult = {
-    chip: number;
-    betAmount: number;
-    winAmount: number;
+    btAmt: number;
+    chip: number[];
+    winAmt: number;
     mult: number;
-    status: 'win' | 'loss';
-};
+    status: string;
+}
 
 export interface LobbyData {
     lobbyId: number;
@@ -35,9 +35,13 @@ export interface UserBet {
 }
 
 export interface BetData {
-    bet_id: string;
-    totalBetAmount: number;
-    userBets: UserBet[];
+    match_id: string,
+    user_id: string,
+    operator_id: string,
+    bet_amount: number,
+    win_amount: number,
+    betResults: BetResult[],
+    winningNumber: number
 };
 
 export interface SingleBetData {
@@ -85,8 +89,8 @@ interface RedisConfig {
 
 export interface AppConfig {
     minBetAmount: number;
+    maxBetAmountOE: number;
     maxBetAmount: number;
-    maxCashoutAmount: number;
     dbConfig: DBConfig;
     redis: RedisConfig;
 };
