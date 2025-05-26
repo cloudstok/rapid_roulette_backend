@@ -52,71 +52,153 @@ const chipMaps: Record<number, string> = {
 }
 
 
+// export function calculateWinnings(betStructure: ReqData[]) {
+//     const winningNumber = getRandomNumber(); // For example, a random number from 1 to 12
+//     let totalWinAmount = 0;
+//     const resultBets: BetResult[] = [];
+
+//     for (const bet of betStructure) {
+//         const chip = bet.chip.split("-").map(Number);
+//         const finalObj = {
+//             btAmt: bet.btAmt,
+//             chip,
+//             winAmt: 0,
+//             mult: 0,
+//             status: 'loss'
+//         }
+//         if (chip.length == 1) {
+//             const singleChip: number = chip[0];
+//             if (singleChip == winningNumber) {
+//                 finalObj['mult'] = 12;
+//                 finalObj['status'] = 'win';
+//                 finalObj['winAmt'] = finalObj['mult'] * finalObj['btAmt'];
+//             }
+//             if (rangeChips[singleChip]) {
+//                 const rangeValue: string = rangeChips[singleChip];
+//                 const chipNumbers = rangeValue.split('-').map(Number);
+//                 if (chipNumbers.includes(winningNumber)) {
+//                     finalObj['mult'] = 2;
+//                     finalObj['status'] = 'win';
+//                     finalObj['winAmt'] = finalObj['mult'] * finalObj['btAmt'];
+//                 }
+//             };
+//             if (colorMathChips[singleChip]) {
+//                 const isEven = winningNumber % 2;
+//                 if ((singleChip == 16 && isEven) || (singleChip == 19 && !isEven)) {
+//                     finalObj['mult'] = 2;
+//                     finalObj['status'] = 'win';
+//                     finalObj['winAmt'] = finalObj['mult'] * finalObj['btAmt'];
+//                 }
+//                 const blackNums = [2, 4, 6, 8, 10, 12];
+//                 const redNums = [1, 3, 5, 7, 9, 11];
+//                 if ((singleChip == 17 && blackNums.includes(winningNumber)) || singleChip == 18 && redNums.includes(winningNumber)) {
+//                     finalObj['mult'] = 2;
+//                     finalObj['status'] = 'win';
+//                     finalObj['winAmt'] = finalObj['mult'] * finalObj['btAmt'];
+//                 }
+//             }
+//             if (chipMaps[singleChip]) {
+//                 const rangeChipsValue: string = chipMaps[singleChip];
+//                 const numRange = rangeChipsValue.split('-').map(Number);
+//                 if (numRange.includes(winningNumber)) {
+//                     finalObj['mult'] = 3;
+//                     finalObj['status'] = 'win';
+//                     finalObj['winAmt'] = finalObj['mult'] * finalObj['btAmt'];
+//                 }
+//             }
+//         };
+//         if (chip.length > 1) {
+//             if (chip.includes(winningNumber)) {
+//                 finalObj['mult'] = chip.length == 2 ? 6 : (chip.length == 3 ? 4 : 3);
+//                 finalObj['status'] = 'win';
+//                 finalObj['winAmt'] = finalObj['mult'] * finalObj['btAmt'];
+//             }
+//         };
+//         if(finalObj['status'] == 'win') totalWinAmount += finalObj['winAmt'];
+        
+//         resultBets.push(finalObj);
+//     }
+
+//     return {
+//         winningNumber,
+//         totalWinAmount,
+//         betResults: resultBets
+//     };
+// };
+
 export function calculateWinnings(betStructure: ReqData[]) {
-    const winningNumber = getRandomNumber(); // For example, a random number from 1 to 12
+    const winningNumber = getRandomNumber(); // Example: 1 to 12
     let totalWinAmount = 0;
     const resultBets: BetResult[] = [];
 
+    const isWin = (condition: boolean, multiplier: number, obj: BetResult) => {
+        if (condition) {
+            obj.mult = multiplier;
+            obj.status = 'win';
+            obj.winAmt = multiplier * obj.btAmt;
+            totalWinAmount += obj.winAmt;
+            return true;
+        }
+        return false;
+    };
+
     for (const bet of betStructure) {
         const chip = bet.chip.split("-").map(Number);
-        const finalObj = {
+        const result: BetResult = {
             btAmt: bet.btAmt,
             chip,
             winAmt: 0,
             mult: 0,
             status: 'loss'
-        }
-        if (chip.length == 1) {
-            const singleChip: number = chip[0];
-            if (singleChip == winningNumber) {
-                finalObj['mult'] = 11;
-                finalObj['status'] = 'win';
-                finalObj['winAmt'] = finalObj['mult'] * finalObj['btAmt'];
+        };
+
+        if (chip.length === 1) {
+            const singleChip = chip[0];
+
+            if (isWin(singleChip === winningNumber, 12, result)) {
+                resultBets.push(result);
+                continue;
             }
+
             if (rangeChips[singleChip]) {
-                const rangeValue: string = rangeChips[singleChip];
-                const chipNumbers = rangeValue.split('-').map(Number);
-                if (chipNumbers.includes(winningNumber)) {
-                    finalObj['mult'] = 11;
-                    finalObj['status'] = 'win';
-                    finalObj['winAmt'] = finalObj['mult'] * finalObj['btAmt'];
+                const [start, end] = rangeChips[singleChip].split('-').map(Number);
+                if (isWin(winningNumber >= start && winningNumber <= end, 2, result)) {
+                    resultBets.push(result);
+                    continue;
                 }
-            };
+            }
+
             if (colorMathChips[singleChip]) {
-                const isEven = winningNumber % 2;
-                if ((singleChip == 16 && isEven) || (singleChip == 19 && !isEven)) {
-                    finalObj['mult'] = 11;
-                    finalObj['status'] = 'win';
-                    finalObj['winAmt'] = finalObj['mult'] * finalObj['btAmt'];
-                }
+                const isEven = winningNumber % 2 === 0;
                 const blackNums = [2, 4, 6, 8, 10, 12];
                 const redNums = [1, 3, 5, 7, 9, 11];
-                if ((singleChip == 17 && blackNums.includes(winningNumber)) || singleChip == 18 && redNums.includes(winningNumber)) {
-                    finalObj['mult'] = 11;
-                    finalObj['status'] = 'win';
-                    finalObj['winAmt'] = finalObj['mult'] * finalObj['btAmt'];
+
+                if (
+                    isWin((singleChip === 16 && isEven) || (singleChip === 19 && !isEven), 2, result) ||
+                    isWin(singleChip === 17 && blackNums.includes(winningNumber), 2, result) ||
+                    isWin(singleChip === 18 && redNums.includes(winningNumber), 2, result)
+                ) {
+                    resultBets.push(result);
+                    continue;
                 }
             }
+
             if (chipMaps[singleChip]) {
-                const rangeChipsValue: string = chipMaps[singleChip];
-                const numRange = rangeChipsValue.split('-').map(Number);
-                if (numRange.includes(winningNumber)) {
-                    finalObj['mult'] = 11;
-                    finalObj['status'] = 'win';
-                    finalObj['winAmt'] = finalObj['mult'] * finalObj['btAmt'];
+                const [start, end] = chipMaps[singleChip].split('-').map(Number);
+                if (isWin(winningNumber >= start && winningNumber <= end, 3, result)) {
+                    resultBets.push(result);
+                    continue;
                 }
             }
-        };
-        if (chip.length > 1) {
+
+        } else {
             if (chip.includes(winningNumber)) {
-                finalObj['mult'] = 11;
-                finalObj['status'] = 'win';
-                finalObj['winAmt'] = finalObj['mult'] * finalObj['btAmt'];
+                const mult = chip.length === 2 ? 6 : chip.length === 3 ? 4 : 3;
+                isWin(true, mult, result);
             }
-        };
-        if(finalObj['status'] == 'win') totalWinAmount += finalObj['winAmt'];
-        
-        resultBets.push(finalObj);
+        }
+
+        resultBets.push(result);
     }
 
     return {
