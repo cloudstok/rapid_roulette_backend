@@ -1,16 +1,14 @@
 import { Server, Socket } from 'socket.io';
-import { getUserDataFromSource } from './module/players/player-event';
 import { eventRouter } from './router/event-router';
 import { setCache, deleteCache } from './utilities/redis-connection';
+import { getUserDataFromSource } from './module/players/player-event';
 //import { getMatchHistory } from './module/bets/bets-session';
 
 
 export const initSocket = (io: Server): void => {
 
   io.on('connection', async (socket: Socket) => {
-
     const { token, game_id } = socket.handshake.query as { token?: string; game_id?: string };
-
     if (!token || !game_id) {
       socket.disconnect(true);
       console.log('Mandatory params missing', token);
@@ -18,7 +16,6 @@ export const initSocket = (io: Server): void => {
     }
 
     const userData = await getUserDataFromSource(token, game_id);
-
     if (!userData) {
       console.log('Invalid token', token);
       socket.disconnect(true);
