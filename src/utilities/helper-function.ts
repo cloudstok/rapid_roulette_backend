@@ -1,3 +1,4 @@
+import { multistream } from 'pino';
 import { BetResult, ReqData, SingleBetData } from '../interfaces';
 import { appConfig } from './app-config';
 import { createLogger } from './logger';
@@ -51,7 +52,14 @@ const chipMaps: Record<number, string> = {
     22: '1-4-7-10'
 }
 
-
+const multConfig: Record<string, number> = {
+    "single": 12,
+    "split": 6,
+    "street": 4,
+    "corner": 3,
+    "three": 3,
+    "default": 2
+}
 // export function calculateWinnings(betStructure: ReqData[]) {
 //     const winningNumber = getRandomNumber(); // For example, a random number from 1 to 12
 //     let totalWinAmount = 0;
@@ -115,7 +123,7 @@ const chipMaps: Record<number, string> = {
 //             }
 //         };
 //         if(finalObj['status'] == 'win') totalWinAmount += finalObj['winAmt'];
-        
+
 //         resultBets.push(finalObj);
 //     }
 
@@ -127,7 +135,8 @@ const chipMaps: Record<number, string> = {
 // };
 
 export function calculateWinnings(betStructure: ReqData[]) {
-    const winningNumber = getRandomNumber(); // Example: 1 to 12
+    // const winningNumber = getRandomNumber(); // Example: 1 to 12
+    const winningNumber = 2;
     let totalWinAmount = 0;
     const resultBets: BetResult[] = [];
 
@@ -155,14 +164,14 @@ export function calculateWinnings(betStructure: ReqData[]) {
         if (chip.length === 1) {
             const singleChip = chip[0];
 
-            if (isWin(singleChip === winningNumber, 12, result)) {
+            if (isWin(singleChip === winningNumber, multConfig.single, result)) {
                 resultBets.push(result);
                 continue;
             }
 
             if (rangeChips[singleChip]) {
                 const [start, end] = rangeChips[singleChip].split('-').map(Number);
-                if (isWin(winningNumber >= start && winningNumber <= end, 2, result)) {
+                if (isWin(winningNumber >= start && winningNumber <= end, multConfig.defult, result)) {
                     resultBets.push(result);
                     continue;
                 }
@@ -174,9 +183,9 @@ export function calculateWinnings(betStructure: ReqData[]) {
                 const redNums = [1, 3, 5, 7, 9, 11];
 
                 if (
-                    isWin((singleChip === 16 && isEven) || (singleChip === 19 && !isEven), 2, result) ||
-                    isWin(singleChip === 17 && blackNums.includes(winningNumber), 2, result) ||
-                    isWin(singleChip === 18 && redNums.includes(winningNumber), 2, result)
+                    isWin((singleChip === 16 && isEven) || (singleChip === 19 && !isEven), multConfig.default, result) ||
+                    isWin(singleChip === 17 && blackNums.includes(winningNumber), multConfig.default, result) ||
+                    isWin(singleChip === 18 && redNums.includes(winningNumber), multConfig.default, result)
                 ) {
                     resultBets.push(result);
                     continue;
@@ -193,7 +202,7 @@ export function calculateWinnings(betStructure: ReqData[]) {
 
         } else {
             if (chip.includes(winningNumber)) {
-                const mult = chip.length === 2 ? 6 : chip.length === 3 ? 4 : 3;
+                const mult = chip.length === 2 ? multConfig.split : chip.length === 3 ? multConfig.street : multConfig.corner;
                 isWin(true, mult, result);
             }
         }

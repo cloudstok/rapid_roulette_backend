@@ -21,14 +21,13 @@ export const placeBet = async (socket: Socket, betData: ReqData[]) => {
 
         let parsedPlayerDetails: FinalUserData;
 
-         try {
+        try {
             parsedPlayerDetails = JSON.parse(playerDetailsRaw);
         } catch (err) {
             socket.emit('betError', 'Failed to parse player details');
             return;
         };
 
-      
         const { userId, operatorId, token, game_id, balance } = parsedPlayerDetails;
         const totalBetAmount = betData.reduce((total, bet) => total + bet.btAmt, 0);
 
@@ -85,7 +84,7 @@ export const placeBet = async (socket: Socket, betData: ReqData[]) => {
             return;
         };
 
-        socket.emit('bet', { message: 'Init bet successfully' });
+        socket.emit('bet_placed', { message: 'Init bet successfully' });
         parsedPlayerDetails.balance -= totalBetAmount;
         await setCache(`PL:${socket.id}`, JSON.stringify(parsedPlayerDetails));
 
@@ -133,12 +132,12 @@ export const placeBet = async (socket: Socket, betData: ReqData[]) => {
         };
 
         await insertBets(dbObj);
-    
-        socket.emit('result', { 
-            winningNumber, 
-            totalWinAmount, 
-            status: totalWinAmount > 0 
-         });
+
+        socket.emit('bet_result', {
+            winningNumber,
+            totalWinAmount,
+            status: totalWinAmount > 0
+        });
 
     } catch (err) {
         console.error("Error in placeBet:", err);
