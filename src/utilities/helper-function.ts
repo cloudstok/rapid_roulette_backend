@@ -7,11 +7,7 @@ import { Socket } from 'socket.io';
 const failedBetLogger = createLogger('failedBets', 'jsonl');
 
 export const logEventAndEmitResponse = (
-    socket: Socket,
-    req: any,
-    res: string,
-    event: string
-): void => {
+    socket: Socket, req: any, res: string, event: string): void => {
     const logData = JSON.stringify({ req, res });
     if (event === 'bet') {
         failedBetLogger.error(logData);
