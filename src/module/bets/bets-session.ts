@@ -38,10 +38,6 @@ export const placeBet = async (socket: Socket, betData: ReqData[]) => {
 
         let isBetInvalid: Boolean = false;
 
-        if (betData.length > 6) {
-            return logEventAndEmitResponse(socket, 'betError', 'Bet limit exceeded', "bet");
-        }
-
         for (const bet of betData) {
             const { chip, btAmt } = bet;
             const chips = chip.split('-').map(Number);

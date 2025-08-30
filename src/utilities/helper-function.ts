@@ -1,8 +1,7 @@
-import { multistream } from 'pino';
-import { BetResult, ReqData, SingleBetData } from '../interfaces';
-import { appConfig } from './app-config';
+import { BetResult, ReqData } from '../interfaces';
 import { createLogger } from './logger';
 import { Socket } from 'socket.io';
+import { randomInt } from 'crypto';
 
 const failedBetLogger = createLogger('failedBets', 'jsonl');
 
@@ -25,8 +24,8 @@ export const getUserIP = (socket: any): string => {
     return socket.handshake.address || '';
 };
 
-function getRandomNumber() {
-    return Math.floor(Math.random() * 13);
+function getRouletteNumber() {
+    return randomInt(0, 13);
 }
 
 const rangeChips: Record<number, string> = {
@@ -58,7 +57,7 @@ const multConfig: Record<string, number> = {
 }
 
 export function calculateWinnings(betStructure: ReqData[]) {
-    const winningNumber = getRandomNumber();
+    const winningNumber = getRouletteNumber();
     let totalWinAmount = 0;
     const resultBets: BetResult[] = [];
 
