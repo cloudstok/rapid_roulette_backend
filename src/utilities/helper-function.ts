@@ -1,8 +1,6 @@
 import { BetResult, ReqData } from '../interfaces';
 import { createLogger } from './logger';
 import { Socket } from 'socket.io';
-import { randomInt } from 'crypto';
-
 const failedBetLogger = createLogger('failedBets', 'jsonl');
 
 export const logEventAndEmitResponse = (
@@ -25,7 +23,7 @@ export const getUserIP = (socket: any): string => {
 };
 
 function getRouletteNumber() {
-    return randomInt(0, 13);
+    return Math.floor(Math.random() * 13);
 }
 
 const rangeChips: Record<number, string> = {
